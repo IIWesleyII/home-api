@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 load_dotenv()
@@ -75,7 +75,20 @@ def get_home(id):
             'households':home.households, 'median_income':home.median_income, 'median_house_value':home.median_house_value,
             'ocean_proximity':home.ocean_proximity
     }
+    
 
+@app.route('/api/v1/data/housing', methods=['GET'])
+def get_homes():
+    homes = Home.query.all()
+    lst = []
+    for home in homes:
+        data = {'id':home.id, 'longitude':home.longitude , 'latitude':home.latitude, 'housing_median_age':home.housing_median_age,
+            'total_rooms':home.total_rooms,'total_bedrooms':home.total_bedrooms, 'population':home.population,
+            'households':home.households, 'median_income':home.median_income, 'median_house_value':home.median_house_value,
+            'ocean_proximity':home.ocean_proximity}
+        lst.append(data)
+
+    return {"homes": lst}
 
 @app.route('/api/v1/data/housing/<int:id>', methods= ['DELETE'])
 def delete_home(id):
